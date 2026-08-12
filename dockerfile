@@ -1,10 +1,14 @@
 FROM php:8.2-apache
 
-# Install database extensions needed for Adminer
-RUN docker-php-ext-install mysqli pdo_mysql
+# Install PostgreSQL drivers required by Adminer
+RUN apt-get update && apt-get install -y libpq-dev \
+    && docker-php-ext-install pdo pdo_pgsql pgsql
 
-# Copy your forked Adminer files to the Apache web directory
+# Copy everything to the server root
 COPY . /var/www/html/
 
-# Expose the default Apache port
+# Ensure Adminer's main script runs as the homepage
+# (If your fork uses a different file name like adminer.php, change it below)
+RUN echo "DirectoryIndex adminer.php index.php" > /var/www/html/.htaccess
+
 EXPOSE 80
