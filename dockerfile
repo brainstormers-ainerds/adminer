@@ -7,8 +7,11 @@ RUN apt-get update && apt-get install -y libpq-dev \
 # Copy everything to the server root
 COPY . /var/www/html/
 
-# Ensure Adminer's main script runs as the homepage
-# (If your fork uses a different file name like adminer.php, change it below)
-RUN echo "DirectoryIndex adminer.php index.php" > /var/www/html/.htaccess
+# Explicitly fix Apache permissions to avoid the 403 Forbidden alert
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html
+
+# Point Apache's directory index to look into the nested folder structure
+RUN echo "DirectoryIndex adminer/index.php index.php" > /var/www/html/.htaccess
 
 EXPOSE 80
